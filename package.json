@@ -5,10 +5,10 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node --watch server.js"
   },
   "keywords": [],
-  "author": "Diplomatura Frontend - Grupo 3 - Ardura, Gabriela; Lamenza, Gabriel; Piazze, Claudio",
+  "author": "Diplomatura Backend - Grupo 3 - Ardura, Gabriela; Lamenza, Gabriel; Piazze, Claudio",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.3.1",

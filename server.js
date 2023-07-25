@@ -1,5 +1,6 @@
 const express = require('express');
 const { connectToMongoDB, disconnectFromMongoDB } = require('./src/mongodb');
+const { Int32 } = require('mongodb');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -21,60 +22,80 @@ app.get('/prendas', async (req, res) => {
         res.status(500).send('Error al conectarse a MongoDB');
         return('Error al conectarse a MongoDB');
     } 
-
         
-        const db = client.db(mibd); //nombre base de datos a conectarse
-        const prendas = await db.collection(micoll).find().toArray();
+    const db = client.db(mibd); //nombre base de datos a conectarse
+    const prendas = await db.collection(micoll).find().toArray();
         
-        console.log('obteniendo datos')
-        console.log(prendas)
+    console.log('obteniendo datos')
+    console.log(prendas)
        
-        res.json(prendas);
-    
-    // await disconnectFromMongoDB();
+    res.json(prendas);
 
+    // await disconnectFromMongoDB();
 });
 
-app.get('/prendas/:id', async (req, res) => {
-    const prendaId = req.params.id;
+//-----------------------------------editó Gabriel-----------------------------------------------------
+// find x codigo
+app.get('/prendas/codigo/:codigo', async (req, res) => {
+    const prendaId = parseInt(req.params.codigo); //parse.int es para convertir el dato de string a integer
+    console.log(prendaId)
+    
+    if (isNaN(prendaId)) {  //este if se incluye para verificar si prendaId contiene un numero, en caso negativo se devuelve un aviso al usuario
+        console.log(prendaId, ' no es un numero')
+        res.status(400).send('Datos invalidos, por favor ingrese un valor numérico');
+        return;
+      } else {
+
+    //     console.log('prendaid = ', prendaId)
+    //     return;
+    // } 
+
     const client = await connectToMongoDB();
     if (!client) {
         res.status(500).send('Error al conectarse a MongoDB');
-        return('Error al conectarse a MongoDB');
+        // return('Error al conectarse a MongoDB');
+        return;
     } 
 
-        
-        const db = client.db(mibd); //nombre base de datos a conectarse
-        const prenda = await db.collection(micoll).find(prendaId);
+    const db = client.db(mibd); //nombre base de datos a conectarse
+    const miColl = await db.collection(micoll); //nombre de la coleccion a utilizar
+    
+    const prenda = await miColl.find({codigo:prendaId}).toArray();
+    // console.log("pasando consulta a bbdd");
         
     // await disconnectFromMongoDB();
-        //   !prenda ? res.status(404).send(`No se encontró la prenda con ID ${prendaId}`) : res.json(prenda)
-          if (!prenda){
-              res.json(prenda)
-              console.log('if')
-            } else {
-                res.json(prenda)
-                // res.status(404).send(`No se encontró la prenda con ID ${prendaId}`)
-                console.log('else')
-            }
+    //   !prenda ? res.status(404).send(`No se encontró la prenda con ID ${prendaId}`) : res.json(prenda)
+    if (!prenda){
+        res.json(prenda)
+        console.log('if')
+    } else {
+        res.json(prenda)
+        console.log ('else')            
+        // res.status(404).send(`No se encontró la prenda con ID ${prendaId}`)
+        }
 
-  });
+  }
+    }
+  );
+
+
 //-----------------------------------edita Gabriela-----------------------------------------------------
-//   app.get('/prendas/nombre/:nombre', async (req, res) => {
-//     const nombreprenda = req.params.nombre;
-//     const client = await connectToMongoDB();
-//           if (!client) {
-//               res.status(500).send('Error al conectarse a MongoDB');
-//               return;
-//           }
 
-//     const regex = new RegExp(nombreprenda.toLowerCase(), 'i')
-          
-    //  const db = client.db(mibd);
-    // const prenda = await db.collection(micoll).find({ nombre: regex }).toArray();
-//     await disconnectFromMongoDB();
-//           !prenda ? res.status(404).send(`No se encontró la prenda: ${nombreprenda}`) : res.json(prenda)
-//   });
+//-------------------------------resultado de Gabriela--------------------------------------------------
+app.get('/prendas/nombre/:nombre', async (req, res) => {
+    const nombreprenda = req.params.nombre;
+    const client = await connectToMongoDB();
+         if (!client) {
+             res.status(500).send('Error al conectarse a MongoDB');
+              return;
+         }
+
+    const regex = new RegExp(nombreprenda.toLowerCase(), 'i')
+    const db = client.db(mibd);
+    const prenda = await db.collection(micoll).find({ nombre: regex }).toArray();
+    await disconnectFromMongoDB();
+         !prenda ? res.status(404).send(`No se encontró la prenda: ${nombreprenda}`) : res.json(prenda)
+});
 
 //   app.get('/prendas/importe/:precio', async (req, res) => {
 //     const precioprenda = parseInt(req.params.precio) || 0;
@@ -82,8 +103,7 @@ app.get('/prendas/:id', async (req, res) => {
 //           if (!client) {
 //               res.status(500).send('Error al conectarse a MongoDB');
 //               return;
-//           }
-          
+//           }     
 //     const db = client.db(mibd);
 //     const prenda = await db.collection('prendas').find({ importe: { $gte: precioprenda } }).toArray();
 //     await disconnectFromMongoDB();
@@ -92,33 +112,33 @@ app.get('/prendas/:id', async (req, res) => {
 //------------------------------------------------Hasta aca edita Gabriela------------------------------------------------------
 
 //   Crear
-//   app.post('/prendas', async (req, res) => {
-//         const nuevaprenda = req.body; //la prenda viene en el body
-//               if (nuevaprenda === undefined) {
-//                   res.status(400).send('Error en el formato de datos a crear.');
-//               }
+app.post('/prendas', async (req, res) => {
+    const nuevaprenda = req.body; //la prenda viene en el body
+        if (nuevaprenda === undefined) {
+            res.status(400).send('Error en el formato de datos a crear.');
+        }
 
-//         const client = await connectToMongoDB();
-//               if (!client) {
-//                   res.status(500).send('Error al conectarse a MongoDB');
-//               }
+    const client = await connectToMongoDB();
+        if (!client) {
+            res.status(500).send('Error al conectarse a MongoDB');
+        }
 
-//         const collection = client.db(mibd).collection('prendas'); //obtener colección
-//               collection.insertOne(nuevaprenda)
-//               .then(() => {
-//                   console.log('Nueva prenda creada:');
-//                   res.status(201).send(nuevaprenda);
-//               })
-//               .catch(error => {
-//                   console.error(error);
-//               })
-//               .finally(()=> {
-//                   client.close();
-//               });
-// });
+    const collection = client.db(mibd).collection(micoll); //obtener colección
+          collection.insertOne(nuevaprenda)
+            .then(() => {
+                console.log('Nueva prenda creada:');
+                res.status(201).send(nuevaprenda);
+            })
+            .catch(error => {
+                console.error(error);
+            })
+            .finally(()=> {
+                client.close();
+            });
+});
 
 // // Modificar
-// app.put('/prendas/:id', async (req, res) => {
+// app.patch('/prendas/:id', async (req, res) => {
 //     const id = req.params.id;
 //     const nuevosDatos = await req.body;
           
@@ -145,38 +165,5 @@ app.get('/prendas/:id', async (req, res) => {
 //             });
 //   });
   
-// // Eliminar
-// app.delete('/prendas/:id', async (req, res) => {
-//     const id = req.params.id;
-//     if (!req.params.id) {
-//         return res.status(400).send('El formato de datos es erróneo o inválido.');
-//     }
-
-//     const client = await connectToMongoDB();
-//     if (!client) {
-//         return res.status(500).send('Error al conectarse a MongoDB');
-//     }
-
-//     client.connect()
-//       .then(() => {
-//             const collection = client.db(mibd).collection('prendas'); //obtener colección
-//             return collection.deleteOne({ id: parseInt(id) });
-//       })
-//       .then((resultado) => {
-//         if (resultado.deletedCount === 0) {
-//             res.status(404).send('No se encontró ninguna prenda con el ID proporcionado:', id);
-//         } else {
-//             console.log('prenda eliminada.');  
-//             res.status(204).send();
-//         }
-//       })
-//       .catch((error) => {
-//             console.error(error);
-//             res.status(500).send('Se produjo un error al intentar eliminar la prenda.');
-//       })
-//       .finally(() => {
-//             client.close();
-//       });
-// });
 
 app.listen(PORT, () => console.log(`API de prendas escuchando en http://localhost:${PORT}`) );
