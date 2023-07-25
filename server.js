@@ -127,34 +127,40 @@ app.patch('/prendas/codigo/:codigo', async (req, res) => {
     const codigo = parseInt(req.params.codigo);
     const nuevosDatos = await req.body;
 
+
     if (isNaN(codigo)) {  //este if se incluye para verificar si prendaId contiene un numero, en caso negativo se devuelve un aviso al usuario
+        console.log('if NaN')
         console.log(codigo, ' no es un numero')
         res.status(400).send('Datos invalidos, por favor ingrese un valor numérico');
         return;
-      } else {
-          
-    if (!nuevosDatos) {
-        res.status(400).send('Error en el formato de datos recibido.');
+
+      } else if (!nuevosDatos){
+        console.log ('!nuevosDatos')
+      //} else {     
+    // if (!nuevosDatos) {
+        res.status(400).send('Error en el formato de datos recibido.')
+    } else {
+        console.log('else')
+        const client = await connectToMongoDB();
+        
+        if (!client) {
+            res.status(500).send('Error al conectarse a MongoDB');
+        }
+        
+        const collection = client.db(mibd).collection(micoll);
+        collection.updateOne({ codigo: codigo }, { $set: nuevosDatos })
+        .then(() => {
+            console.log('prenda modificada:');
+            res.status(200).send(nuevosDatos);
+        })
+        .catch((error) => {
+            res.status(500).json({descripcion: 'Error al modificar la prenda' });
+        })
+        .finally(()=> {
+            client.close();
+        });
     }
-
-    const client = await connectToMongoDB();
-          if (!client) {
-              res.status(500).send('Error al conectarse a MongoDB');
-          }
-
-          const collection = client.db(mibd).collection(micoll);
-          collection.updateOne({ codigo: codigo }, { $set: nuevosDatos })
-          .then(() => {
-                console.log('prenda modificada:');
-                res.status(200).send(nuevosDatos);
-            })
-            .catch((error) => {
-                res.status(500).json({descripcion: 'Error al modificar la prenda' });
-            })
-            .finally(()=> {
-                client.close();
-            });
-  }});
+  });
   
 
 app.listen(PORT, () => console.log(`API de prendas escuchando en http://localhost:${PORT}`) );
