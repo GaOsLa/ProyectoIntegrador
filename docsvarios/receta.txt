@@ -1,0 +1,13 @@
+--------------------desde cero----------------------------------------------------------
+crear cluster
+mongodb compass -->subir el json y armar la bbdd
+VSCode --> crear un proyecto
+
+------------------- cuando descomprimis el archivo del pryecto--------------------------
+terminal --> npm install express 
+terminal --< npm install mongodb
+terminal --> npm install dotenv
+crear los archivos .js -- uno el server.js y otro para ./src/mongodb.js
+pegar esta linea en el package.json   "start": "node --watch server.js"
+crear las apis
+probar en postman o thunder cada API
