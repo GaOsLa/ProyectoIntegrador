@@ -10,12 +10,11 @@ const micoll = "Prendas" //<<-------------------- convertir esta cadena igual a 
 app.use(express.json());
 
 app.use((req, res, next) => {
-    // res.header("Content-Type", "application/json; charset=utf-8");
     next();
 });
 app.get('/', (req, res) => { res.status(200).end('¡Bienvenido a la API de Prendas!'); } );
 
-
+// API listar todos los registros del servidor
 app.get('/prendas', async (req, res) => {
     const client = await connectToMongoDB();
     if (!client) {
@@ -27,18 +26,14 @@ app.get('/prendas', async (req, res) => {
     const prendas = await db.collection(micoll).find().toArray();
         
     console.log('obteniendo datos')
-    console.log(prendas)
-       
+         
     res.json(prendas);
 
-    // await disconnectFromMongoDB();
 });
 
-//-----------------------------------editó Gabriel-----------------------------------------------------
 // find x codigo
 app.get('/prendas/codigo/:codigo', async (req, res) => {
     const prendaId = parseInt(req.params.codigo); //parse.int es para convertir el dato de string a integer
-    console.log(prendaId)
     
     if (isNaN(prendaId)) {  //este if se incluye para verificar si prendaId contiene un numero, en caso negativo se devuelve un aviso al usuario
         console.log(prendaId, ' no es un numero')
@@ -46,14 +41,9 @@ app.get('/prendas/codigo/:codigo', async (req, res) => {
         return;
       } else {
 
-    //     console.log('prendaid = ', prendaId)
-    //     return;
-    // } 
-
     const client = await connectToMongoDB();
     if (!client) {
         res.status(500).send('Error al conectarse a MongoDB');
-        // return('Error al conectarse a MongoDB');
         return;
     } 
 
@@ -61,24 +51,20 @@ app.get('/prendas/codigo/:codigo', async (req, res) => {
     const miColl = await db.collection(micoll); //nombre de la coleccion a utilizar
     
     const prenda = await miColl.find({codigo:prendaId}).toArray();
-    // console.log("pasando consulta a bbdd");
-        
-    // await disconnectFromMongoDB();
-    //   !prenda ? res.status(404).send(`No se encontró la prenda con ID ${prendaId}`) : res.json(prenda)
+
     if (!prenda){
         res.json(prenda)
         console.log('if')
     } else {
         res.json(prenda)
         console.log ('else')            
-        // res.status(404).send(`No se encontró la prenda con ID ${prendaId}`)
         }
 
   }
     }
   );
 
-//-------------------------------resultado de Gabriela--------------------------------------------------
+//Busqueda por nombre
 app.get('/prendas/nombre/:nombre', async (req, res) => {
     const nombreprenda = req.params.nombre;
     const client = await connectToMongoDB();
@@ -94,9 +80,7 @@ app.get('/prendas/nombre/:nombre', async (req, res) => {
          !prenda ? res.status(404).send(`No se encontró la prenda: ${nombreprenda}`) : res.json(prenda)
 });
 
-//------------------------------------------------Hasta aca edita Gabriela------------------------------------------------------
-
-//   Crear
+//   API Crear
 app.post('/prendas', async (req, res) => {
     const nuevaprenda = req.body; //la prenda viene en el body
         if (nuevaprenda === undefined) {
@@ -122,25 +106,21 @@ app.post('/prendas', async (req, res) => {
             });
 });
 
-// // Modificar
+// API Modificar
 app.patch('/prendas/codigo/:codigo', async (req, res) => {
     const codigo = parseInt(req.params.codigo);
     const nuevosDatos = await req.body;
 
 
     if (isNaN(codigo)) {  //este if se incluye para verificar si prendaId contiene un numero, en caso negativo se devuelve un aviso al usuario
-        console.log('if NaN')
-        console.log(codigo, ' no es un numero')
+
         res.status(400).send('Datos invalidos, por favor ingrese un valor numérico');
         return;
 
-      } else if (!nuevosDatos){
-        console.log ('!nuevosDatos')
-      //} else {     
-    // if (!nuevosDatos) {
+      } else if (!nuevosDatos){  
+
         res.status(400).send('Error en el formato de datos recibido.')
     } else {
-        console.log('else')
         const client = await connectToMongoDB();
         
         if (!client) {

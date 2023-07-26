@@ -7,8 +7,6 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 // busco los datos de coneccion en el .env
 const URI = process.env.MONGODB_URLSTRING;
 
-
-
 // const client = new MongoClient(URI);
 
 const client = new MongoClient(URI, 
