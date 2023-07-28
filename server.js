@@ -59,7 +59,6 @@ app.get('/prendas/codigo/:codigo', async (req, res) => {
         res.json(prenda)
         console.log ('else')            
         }
-
   }
     }
   );

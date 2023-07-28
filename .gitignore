@@ -1380,9 +1380,6 @@ node_modules/yallist/LICENSE
 node_modules/yallist/package.json
 node_modules/yallist/README.md
 node_modules/yallist/yallist.js
-src/mongodb_sug.js
-docsvarios/mongobasic.js
 .gitignore
-docsvarios/mongodb_sug.js
 docsvarios/Consignas_1o_trabajo_integrador.pdf
 docsvarios/packagejson.txt

@@ -4,6 +4,7 @@ mongodb compass -->subir el json y armar la bbdd
 VSCode --> crear un proyecto
 
 ------------------- cuando descomprimis el archivo del pryecto--------------------------
+terminal --> npm init -y.
 terminal --> npm install express 
 terminal --< npm install mongodb
 terminal --> npm install dotenv
