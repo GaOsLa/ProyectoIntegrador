@@ -9,9 +9,11 @@ const micoll = "Prendas" //<<-------------------- convertir esta cadena igual a 
 
 app.use(express.json());
 
-app.use((req, res, next) => {
-    next();
-});
+// app.use((req, res, next) => {
+//     next();
+// });
+
+
 app.get('/', (req, res) => { res.status(200).end('¡Bienvenido a la API de Prendas!'); } );
 
 // API listar todos los registros del servidor
@@ -59,6 +61,7 @@ app.get('/prendas/codigo/:codigo', async (req, res) => {
         res.json(prenda)
         console.log ('else')            
         }
+
   }
     }
   );
@@ -140,6 +143,11 @@ app.patch('/prendas/codigo/:codigo', async (req, res) => {
         });
     }
   });
-  
+
+app.use((req, res, next) => {
+    console.log('app use error')
+    res.status(404).send('Lo siento, la pagina solicitada no existe.');
+    // next();
+});
 
 app.listen(PORT, () => console.log(`API de prendas escuchando en http://localhost:${PORT}`) );
